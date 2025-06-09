@@ -30,12 +30,6 @@
       justify-content: space-between;
       align-items: center;
     }
-    .pedido-img {
-      width: 60px;
-      height: 60px;
-      background-color: #ccc;
-      margin-right: 15px;
-    }
     .pedido-info {
       flex-grow: 1;
     }
@@ -101,7 +95,7 @@
 
     <div id="pedidos-container"></div>
 
-    <button class="toggle-button" onclick="toggleDespesas()">
+    <button class="toggle-button" onclick="toggleDespachados()">
       <span id="arrow">▶</span> Pedidos Despachados
     </button>
     <div class="expandable-content" id="despachados"></div>
@@ -119,39 +113,61 @@
       container.innerHTML = '';
       despachadosContainer.innerHTML = '';
 
-      data.pedidos.forEach(pedido => {
+      data.forEach((pedido) => {
         const card = document.createElement('div');
         card.className = 'pedido-card';
 
         const info = document.createElement('div');
         info.className = 'pedido-info';
+
+        const dataFormatada = new Date(pedido.dataPedido).toLocaleDateString('pt-BR');
+        const produtosLista = pedido.produtos.map(p => `<li>${p}</li>`).join('');
+
         info.innerHTML = `
           <p><strong>PEDIDO #${pedido.id}</strong></p>
+          <p>Data: ${dataFormatada}</p>
           <p>Total: R$${pedido.valorTotal.toFixed(2)}</p>
           <p>Status: ${pedido.status}</p>
+          <p>Produtos:</p>
+          <ul>${produtosLista}</ul>
         `;
 
         const actions = document.createElement('div');
         actions.className = 'pedido-actions';
 
-        if (pedido.status !== 'Despachado') {
-          const btnDespachar = document.createElement('button');
-          btnDespachar.textContent = 'Despachar';
-          btnDespachar.onclick = () => despacharPedido(pedido.id);
-          actions.appendChild(btnDespachar);
-        } else {
+        if (pedido.status === 'Despachado') {
           const statusLabel = document.createElement('span');
           statusLabel.className = 'status-label entregue';
           statusLabel.textContent = 'Saiu para entrega';
+
+          const btnEntregar = document.createElement('button');
+          btnEntregar.textContent = 'Confirmar Entrega';
+          btnEntregar.onclick = () => confirmarEntrega(pedido.id);
+
           actions.appendChild(statusLabel);
-        }
-
-        card.appendChild(info);
-        card.appendChild(actions);
-
-        if (pedido.status === 'Despachado') {
+          actions.appendChild(btnEntregar);
+          card.appendChild(info);
+          card.appendChild(actions);
           despachadosContainer.appendChild(card);
+
+        } else if (pedido.status === 'Entregue') {
+          const statusLabel = document.createElement('span');
+          statusLabel.className = 'status-label entregue';
+          statusLabel.textContent = 'Entregue';
+
+          actions.appendChild(statusLabel);
+          card.appendChild(info);
+          card.appendChild(actions);
+          despachadosContainer.appendChild(card);
+
         } else {
+          const btnDespachar = document.createElement('button');
+          btnDespachar.textContent = 'Despachar';
+          btnDespachar.onclick = () => despacharPedido(pedido.id);
+
+          actions.appendChild(btnDespachar);
+          card.appendChild(info);
+          card.appendChild(actions);
           container.appendChild(card);
         }
       });
@@ -166,7 +182,16 @@
       carregarPedidos();
     }
 
-    function toggleDespesas() {
+    async function confirmarEntrega(id) {
+      const response = await fetch(`https://cafeteriaapp.onrender.com/api/Pedidos/${id}/confirmar`, {
+        method: 'GET'
+      });
+      const result = await response.json();
+      alert(result.mensagem);
+      carregarPedidos();
+    }
+
+    function toggleDespachados() {
       const content = document.getElementById('despachados');
       const arrow = document.getElementById('arrow');
       if (content.style.display === 'block') {

@@ -17,6 +17,9 @@
   <main>
     <input type="text" placeholder="Pesquisar" class="search">
 
+    <!-- BOTÃO MEUS PEDIDOS -->
+    <button class="titulo" id="meusPedidosBtn">📦 Meus Pedidos</button>
+
     <button class="titulo">PROMOÇÃO DO DIA</button>
     <div class="promocao">
       <div class="imagem"></div>
@@ -59,12 +62,14 @@
 <script>
   const perfilBtn = document.getElementById('perfilBtn');
   const pedidosBtn = document.getElementById('pedidosBtn');
+  const meusPedidosBtn = document.getElementById('meusPedidosBtn');
   const menuLateral = document.getElementById('menuLateral');
   const fecharMenu = document.getElementById('fecharMenu');
 
   perfilBtn.onclick = () => menuLateral.style.right = "0";
   fecharMenu.onclick = () => menuLateral.style.right = "-450px";
   pedidosBtn.onclick = () => window.location.href = "pedidos.html";
+  meusPedidosBtn.onclick = () => window.location.href = "UsuPedidos.html";
 
   const cardapios = {};
   let restauranteAtual = "";
@@ -91,7 +96,7 @@
           li.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span>${produto.nome} - R$ ${produto.valor.toFixed(2)}</span>
-              <button onclick='adicionarItem(${JSON.stringify(produto)}, ${restauranteId})'" class="botao-adicionar" style="padding: 4px 10px; font-size: 0.9rem;">+</button>
+              <button onclick='adicionarItem(${JSON.stringify(produto)}, ${restauranteId})' class="botao-adicionar" style="padding: 4px 10px; font-size: 0.9rem;">+</button>
             </div>
           `;
           lista.appendChild(li);
@@ -117,10 +122,10 @@
       valor: produto.valor,
       idRestaurante,
       nomeRestaurante: restauranteAtual
-  });
+    });
     localStorage.setItem('carrinho', JSON.stringify(carrinho));
     alert(`Item adicionado: ${produto.nome}`);
-}
+  }
 
   window.onclick = function(event) {
     const modal = document.getElementById('cardapioModal');
@@ -180,7 +185,5 @@
       });
   };
 </script>
-
-
 </body>
 </html>
