@@ -42,14 +42,23 @@
       margin-bottom: 5px;
     }
 
-    .limpar-btn {
-      background-color: #c0392b;
+    .btn {
+      background-color: #2980b9;
       color: white;
       border: none;
       padding: 10px 15px;
       border-radius: 8px;
       cursor: pointer;
       font-size: 1rem;
+      margin: 0 10px;
+    }
+
+    .btn:hover {
+      background-color: #21618c;
+    }
+
+    .limpar-btn {
+      background-color: #c0392b;
     }
 
     .limpar-btn:hover {
@@ -74,7 +83,8 @@
   <main>
     <div id="listaPedidos" style="padding: 20px;"></div>
     <div class="center">
-      <button class="limpar-btn" onclick="limparCarrinho()">Limpar pedido</button>
+      <button class="btn" onclick="confirmarPedido()">Confirmar Pedido</button>
+      <button class="btn limpar-btn" onclick="limparCarrinho()">Limpar Pedido</button>
     </div>
   </main>
 
@@ -89,9 +99,9 @@
       }
 
       const agrupado = {};
-      carrinho.forEach(({ restaurante, item }) => {
-        if (!agrupado[restaurante]) agrupado[restaurante] = [];
-        agrupado[restaurante].push(item);
+      carrinho.forEach((item) => {
+        if (!agrupado[item.nomeRestaurante]) agrupado[item.nomeRestaurante] = [];
+        agrupado[item.nomeRestaurante].push(item);
       });
 
       container.innerHTML = '';
@@ -101,18 +111,75 @@
         div.innerHTML = `
           <h3>${restaurante}</h3>
           <ul>
-            ${agrupado[restaurante].map(i => `<li>${i}</li>`).join('')}
+            ${agrupado[restaurante].map(p => `<li>${p.nome} - R$ ${p.valor.toFixed(2)}</li>`).join('')}
           </ul>
         `;
         container.appendChild(div);
-      }
-    }
+  }
+}
+
 
     function limparCarrinho() {
       if (confirm("Deseja realmente limpar o pedido?")) {
         localStorage.removeItem('carrinho');
         carregarPedidos();
       }
+    }
+
+    async function confirmarPedido() {
+      const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+      const userId = localStorage.getItem('userId');
+
+      if (!userId) {
+        alert("Usuário não identificado. Faça login novamente.");
+        return;
+      }
+
+      if (carrinho.length === 0) {
+        alert("Carrinho vazio.");
+        return;
+      }
+
+      // Agrupar por restauranteId
+      const pedidosPorRestaurante = {};
+
+      carrinho.forEach(({ idRestaurante, idProduto }) => {
+        if (!pedidosPorRestaurante[idRestaurante]) pedidosPorRestaurante[idRestaurante] = [];
+        pedidosPorRestaurante[idRestaurante].push({ idProduto });
+      });
+
+      // Enviar um pedido por restaurante
+      for (const idRestaurante in pedidosPorRestaurante) {
+        const body = {
+          idRestaurante: Number(idRestaurante),
+          produtos: pedidosPorRestaurante[idRestaurante],
+          idUsuario: Number(userId)
+        };
+
+        try {
+          const response = await fetch("https://cafeteriaapp.onrender.com/api/Pedidos/cadastrar", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body)
+          });
+
+          if (!response.ok) {
+            throw new Error(`Erro ao enviar pedido para restaurante ${idRestaurante}`);
+          }
+
+          console.log(`Pedido enviado para restaurante ${idRestaurante}`);
+        } catch (err) {
+          console.error(err);
+          alert("Ocorreu um erro ao confirmar o pedido.");
+          return;
+        }
+      }
+
+      alert("Pedido realizado com sucesso!");
+      localStorage.removeItem('carrinho');
+      carregarPedidos();
     }
 
     document.addEventListener('DOMContentLoaded', carregarPedidos);

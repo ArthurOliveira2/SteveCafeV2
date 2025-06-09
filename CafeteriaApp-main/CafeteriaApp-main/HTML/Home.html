@@ -67,11 +67,11 @@
   pedidosBtn.onclick = () => window.location.href = "pedidos.html";
 
   const cardapios = {};
-
   let restauranteAtual = "";
 
   function abrirCardapio(nome, restauranteId, imagem) {
     restauranteAtual = nome;
+    localStorage.setItem('idRestauranteAtual', restauranteId); // salva o id do restaurante
     document.getElementById('nomeRestaurante').innerText = `Cardápio - ${nome}`;
     document.getElementById('imagemRestaurante').src = imagem || "";
 
@@ -91,7 +91,7 @@
           li.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span>${produto.nome} - R$ ${produto.valor.toFixed(2)}</span>
-              <button onclick="adicionarItem('${produto.nome}')" class="botao-adicionar" style="padding: 4px 10px; font-size: 0.9rem;">+</button>
+              <button onclick='adicionarItem(${JSON.stringify(produto)}, ${restauranteId})'" class="botao-adicionar" style="padding: 4px 10px; font-size: 0.9rem;">+</button>
             </div>
           `;
           lista.appendChild(li);
@@ -103,18 +103,24 @@
         console.error("Erro ao buscar cardápio:", error);
         alert("Erro ao carregar o cardápio.");
       });
-}
+  }
 
   function fecharCardapio() {
     document.getElementById('cardapioModal').style.display = "none";
   }
 
-  function adicionarItem(item) {
+  function adicionarItem(produto, idRestaurante) {
     let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
-    carrinho.push({ restaurante: restauranteAtual, item });
+    carrinho.push({
+      idProduto: produto.id,
+      nome: produto.nome,
+      valor: produto.valor,
+      idRestaurante,
+      nomeRestaurante: restauranteAtual
+  });
     localStorage.setItem('carrinho', JSON.stringify(carrinho));
-    alert(`Item adicionado: ${item}`);
-  }
+    alert(`Item adicionado: ${produto.nome}`);
+}
 
   window.onclick = function(event) {
     const modal = document.getElementById('cardapioModal');
@@ -123,64 +129,58 @@
     }
   }
 
-  // 🟢 Busca os restaurantes da API
-window.onload = () => {
-  const userId = localStorage.getItem('userId');  // pega id do usuário logado
+  // Carrega os restaurantes
+  window.onload = () => {
+    const userId = localStorage.getItem('userId');
 
-  fetch('https://cafeteriaapp.onrender.com/api/Restaurante/listar')
-    .then(response => response.json())
-    .then(async (dados) => {
-      const container = document.getElementById('listaRestaurantes');
-      container.innerHTML = "";
+    fetch('https://cafeteriaapp.onrender.com/api/Restaurante/listar')
+      .then(response => response.json())
+      .then(async (dados) => {
+        const container = document.getElementById('listaRestaurantes');
+        container.innerHTML = "";
 
-      for (const restaurante of dados) {
-        const nome = restaurante.nome || "Restaurante";
-        const imagem = restaurante.foto !== "string" ? restaurante.foto : "https://via.placeholder.com/150";
-        const avaliacao = restaurante.avaliacao !== null ? `${restaurante.avaliacao.toFixed(1)} ⭐` : "Sem avaliação";
+        for (const restaurante of dados) {
+          const nome = restaurante.nome || "Restaurante";
+          const imagem = restaurante.foto !== "string" ? restaurante.foto : "https://via.placeholder.com/150";
+          const avaliacao = restaurante.avaliacao !== null ? `${restaurante.avaliacao.toFixed(1)} ⭐` : "Sem avaliação";
 
-        // Chamada para verificar se o usuário é proprietário deste restaurante
-        let isProprietario = false;
-        try {
-          const proprietariosResp = await fetch(`https://cafeteriaapp.onrender.com/api/UsuarioRestaurante/${restaurante.id}/getProprietarioRestaurante`);
-          const proprietarios = await proprietariosResp.json();
+          let isProprietario = false;
+          try {
+            const proprietariosResp = await fetch(`https://cafeteriaapp.onrender.com/api/UsuarioRestaurante/${restaurante.id}/getProprietarioRestaurante`);
+            const proprietarios = await proprietariosResp.json();
+            isProprietario = proprietarios.some(p => p.idUsuario.toString() === userId);
+          } catch (error) {
+            console.error("Erro ao verificar proprietário do restaurante:", error);
+          }
 
-          isProprietario = proprietarios.some(p => p.idUsuario.toString() === userId);
-        } catch (error) {
-          console.error("Erro ao verificar proprietário do restaurante:", error);
+          const card = document.createElement('div');
+          card.className = 'card restaurante';
+          card.innerHTML = `
+            <img src="${imagem}" alt="${nome}">
+            <p class="titulo-card">${nome}</p>
+            <p>${avaliacao}</p>
+            <button class="abrir-cardapio-btn">Abrir Cardápio</button>
+            ${isProprietario ? '<button class="meu-restaurante-btn">Meu Restaurante</button>' : ''}
+          `;
+
+          card.querySelector('.abrir-cardapio-btn').onclick = () => abrirCardapio(nome, restaurante.id, imagem);
+
+          if (isProprietario) {
+            card.querySelector('.meu-restaurante-btn').onclick = () => {
+              alert(`Bem-vindo ao painel do seu restaurante: ${nome}`);
+              window.location.href = `adminView.html?id=${restaurante.id}`;
+            };
+          }
+
+          container.appendChild(card);
         }
-
-        // Criar o card do restaurante
-        const card = document.createElement('div');
-        card.className = 'card restaurante';
-        card.innerHTML = `
-          <img src="${imagem}" alt="${nome}">
-          <p class="titulo-card">${nome}</p>
-          <p>${avaliacao}</p>
-          <button class="abrir-cardapio-btn">Abrir Cardápio</button>
-          ${isProprietario ? '<button class="meu-restaurante-btn">Meu Restaurante</button>' : ''}
-        `;
-
-        // Evento para abrir cardápio
-        card.querySelector('.abrir-cardapio-btn').onclick = () => abrirCardapio(nome, restaurante.id, imagem);
-
-        // Evento do botão "Meu Restaurante" (se existir)
-        if (isProprietario) {
-          card.querySelector('.meu-restaurante-btn').onclick = () => {
-            alert(`Bem-vindo ao painel do seu restaurante: ${nome}`);
-            // Aqui você pode redirecionar para uma página exclusiva de controle do restaurante, por exemplo:
-             window.location.href = `adminView.html?id=${restaurante.id}`;
-          };
-        }
-
-        container.appendChild(card);
-      }
-    })
-    .catch(error => {
-      console.error("Erro ao buscar restaurantes:", error);
-    });
-};
-
+      })
+      .catch(error => {
+        console.error("Erro ao buscar restaurantes:", error);
+      });
+  };
 </script>
+
 
 </body>
 </html>
