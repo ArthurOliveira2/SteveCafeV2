@@ -90,83 +90,84 @@
     <button id="fecharMenu">Fechar ✖</button>
   </aside>
 
-  <script>
-    const perfilBtn = document.getElementById('perfilBtn');
-    const pedidosBtn = document.getElementById('pedidosBtn');
-    const menuLateral = document.getElementById('menuLateral');
-    const fecharMenu = document.getElementById('fecharMenu');
+<script>
+  const perfilBtn = document.getElementById('perfilBtn');
+  const pedidosBtn = document.getElementById('pedidosBtn');
+  const menuLateral = document.getElementById('menuLateral');
+  const fecharMenu = document.getElementById('fecharMenu');
 
-    perfilBtn.onclick = () => menuLateral.style.right = "0";
-    fecharMenu.onclick = () => menuLateral.style.right = "-450px";
-    pedidosBtn.onclick = () => window.location.href = "pedidos.html";
+  perfilBtn.onclick = () => menuLateral.style.right = "0";
+  fecharMenu.onclick = () => menuLateral.style.right = "-450px";
+  pedidosBtn.onclick = () => window.location.href = "pedidos.html";
 
-    const cardapios = {
-      "Pastéis do Robson": {
-        imagem: "/SteveCafeV2/CafeteriaApp-main/CafeteriaApp-main/IMG/istock-1496435795.jpg",
-        itens: ["Pastel de carne - R$8", "Pastel de queijo - R$7", "Refrigerante - R$5"]
-      },
-      "Pizza da Vó Maria": {
-        imagem: "/SteveCafeV2/CafeteriaApp-main/CafeteriaApp-main/IMG/pizza.jpg",
-        itens: ["Pizza calabresa - R$35", "Pizza marguerita - R$38", "Suco natural - R$6"]
-      },
-      "Lanches do Zé": {
-        imagem: "/SteveCafeV2/CafeteriaApp-main/CafeteriaApp-main/IMG/lanche.jpg",
-        itens: ["Sanduíche natural - R$12", "Café preto - R$4", "Bolo caseiro - R$6"]
-      },
-      "Burguer da Ju": {
-        imagem: "/SteveCafeV2/CafeteriaApp-main/CafeteriaApp-main/IMG/images.jpg",
-        itens: ["Cheeseburguer - R$20", "Combo duplo - R$35", "Batata média - R$9"]
-      },
-      "Tapiocaria Brasil": {
-        imagem: "/SteveCafeV2/CafeteriaApp-main/CafeteriaApp-main/IMG/tapioca.jpg",
-        itens: ["Tapioca de frango - R$15", "Tapioca doce - R$12", "Água de coco - R$5"]
-      },
-      "Yakissoba Express": {
-        imagem: "/SteveCafeV2/CafeteriaApp-main/CafeteriaApp-main/IMG/Yakissoba-tradicional.png",
-        itens: ["Yakissoba carne - R$30", "Veggie yakissoba - R$28", "Chá verde - R$4"]
-      }
-    };
-
-    let restauranteAtual = "";
-
-    function abrirCardapio(nome) {
-      restauranteAtual = nome;
-      document.getElementById('nomeRestaurante').innerText = Cardápio - ${nome};
-      document.getElementById('imagemRestaurante').src = cardapios[nome].imagem;
-
-      const lista = document.getElementById('itensCardapio');
-      lista.innerHTML = "";
-      cardapios[nome].itens.forEach(item => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span>${item}</span>
-            <button onclick="adicionarItem('${item}')" class="botao-adicionar" style="padding: 4px 10px; font-size: 0.9rem;">+</button>
-          </div>
-        `;
-        lista.appendChild(li);
-      });
-
-      document.getElementById('cardapioModal').style.display = "block";
+  const cardapios = {
+    "Pastéis do Robson": {
+      imagem: "/CafeteriaApp-main/CafeteriaApp-main/IMG/istock-1496435795.jpg",
+      itens: ["Pastel de carne - R$8", "Pastel de queijo - R$7", "Refrigerante - R$5"]
+    },
+    "Pizza da Vó Maria": {
+      imagem: "/CafeteriaApp-main/CafeteriaApp-main/IMG/pizza.jpg",
+      itens: ["Pizza calabresa - R$35", "Pizza marguerita - R$38", "Suco natural - R$6"]
+    },
+    "Lanches do Zé": {
+      imagem: "/CafeteriaApp-main/CafeteriaApp-main/IMG/lanche.jpg",
+      itens: ["Sanduíche natural - R$12", "Café preto - R$4", "Bolo caseiro - R$6"]
+    },
+    "Burguer da Ju": {
+      imagem: "/CafeteriaApp-main/CafeteriaApp-main/IMG/images.jpg",
+      itens: ["Cheeseburguer - R$20", "Combo duplo - R$35", "Batata média - R$9"]
+    },
+    "Tapiocaria Brasil": {
+      imagem: "/CafeteriaApp-main/CafeteriaApp-main/IMG/tapioca.jpg",
+      itens: ["Tapioca de frango - R$15", "Tapioca doce - R$12", "Água de coco - R$5"]
+    },
+    "Yakissoba Express": {
+      imagem: "/CafeteriaApp-main/CafeteriaApp-main/IMG/Yakissoba-tradicional.png",
+      itens: ["Yakissoba carne - R$30", "Veggie yakissoba - R$28", "Chá verde - R$4"]
     }
+  };
 
-    function fecharCardapio() {
-      document.getElementById('cardapioModal').style.display = "none";
-    }
+  let restauranteAtual = "";
 
-    function adicionarItem(item) {
-      let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
-      carrinho.push({ restaurante: restauranteAtual, item });
-      localStorage.setItem('carrinho', JSON.stringify(carrinho));
-      alert(Item adicionado: ${item});
-    }
+  function abrirCardapio(nome) {
+    restauranteAtual = nome;
+    document.getElementById('nomeRestaurante').innerText = `Cardápio - ${nome}`;
+    document.getElementById('imagemRestaurante').src = cardapios[nome].imagem;
 
-    window.onclick = function(event) {
-      const modal = document.getElementById('cardapioModal');
-      if (event.target == modal) {
-        modal.style.display = "none";
-      }
+    const lista = document.getElementById('itensCardapio');
+    lista.innerHTML = "";
+    cardapios[nome].itens.forEach(item => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span>${item}</span>
+          <button onclick="adicionarItem('${item}')" class="botao-adicionar" style="padding: 4px 10px; font-size: 0.9rem;">+</button>
+        </div>
+      `;
+      lista.appendChild(li);
+    });
+
+    document.getElementById('cardapioModal').style.display = "block";
+  }
+
+  function fecharCardapio() {
+    document.getElementById('cardapioModal').style.display = "none";
+  }
+
+  function adicionarItem(item) {
+    let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+    carrinho.push({ restaurante: restauranteAtual, item });
+    localStorage.setItem('carrinho', JSON.stringify(carrinho));
+    alert(`Item adicionado: ${item}`);
+  }
+
+  window.onclick = function(event) {
+    const modal = document.getElementById('cardapioModal');
+    if (event.target == modal) {
+      modal.style.display = "none";
     }
-  </script>
+  }
+</script>
+
 </body>
 </html>
