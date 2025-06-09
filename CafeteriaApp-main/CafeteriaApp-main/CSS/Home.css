@@ -6,8 +6,8 @@ body {
 }
 
 header {
-  background: #f1f1f1;
-  color: black;
+  background: linear-gradient(910deg, #9b2fde, #45c4da, #2916bb);
+  color: rgb(255, 255, 255);
   padding: 10px 20px;
   display: flex;
   justify-content: space-between;
