@@ -3,11 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <title>Pedido Atual</title>
-  <link rel="stylesheet" href="/CafeteriaApp-main/CafeteriaApp-main/CSS/Home.css">
+  <link rel="stylesheet" href="/SteveCafeV2/CafeteriaApp-main/CafeteriaApp-main/CSS/Home.css">
+  <style>
+    .pedido-item {
+      background: #fff;
+      color: black;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+    }
+    .pedido-item h3 {
+      margin: 0 0 5px;
+    }
+    .limpar-btn {
+      background-color: #c0392b;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .limpar-btn:hover {
+      background-color: #a93226;
+    }
+  </style>
 </head>
 <body class="tela-pedidos">
   <header>
-    <h1></h1>
+    <h1>Seu Pedido</h1>
     <div class="icons">
       <button onclick="window.location.href='Home.html'">🏠</button>
       <button id="perfilBtn">👤</button>
@@ -15,41 +38,50 @@
   </header>
 
   <main>
-    <input type="text" placeholder="Pesquisar" class="search">
-    <button class="titulo">PEDIDO ATUAL</button>
-
-    <div class="pedido-atual">
-      <div class="imagem"></div>
-      <div class="detalhes">
-        <p>Pastéis do Robson</p>
-        <p>R$25,00</p>
-        <p>Rua aqui com lá</p>
-      </div>
-      <div class="mapa">*IMAGEM DO MAPA*</div>
+    <div id="listaPedidos" style="padding: 20px;"></div>
+    <div style="text-align: center; margin-bottom: 30px;">
+      <button class="limpar-btn" onclick="limparCarrinho()">Limpar pedido</button>
     </div>
   </main>
 
-  <aside id="menuLateral" class="menu-lateral">
-    <div class="perfil-header">
-      <div class="icon">👤</div>
-      <div class="nome">Beltrano da silva</div>
-    </div>
-    <ul>
-      <li>Perfil</li>
-      <li>Configurações</li>
-      <li>Pagamentos</li>
-      <li>Trabalhe conosco</li>
-    </ul>
-    <button id="fecharMenu">Fechar ✖</button>
-  </aside>
-
   <script>
-    const perfilBtn = document.getElementById('perfilBtn');
-    const menuLateral = document.getElementById('menuLateral');
-    const fecharMenu = document.getElementById('fecharMenu');
+    function carregarPedidos() {
+      const container = document.getElementById('listaPedidos');
+      const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
 
-    perfilBtn.onclick = () => menuLateral.style.right = "0";
-    fecharMenu.onclick = () => menuLateral.style.right = "-450px";
+      if (carrinho.length === 0) {
+        container.innerHTML = '<p style="text-align:center">Nenhum item no pedido ainda 😔</p>';
+        return;
+      }
+
+      const agrupado = {};
+      carrinho.forEach(({ restaurante, item }) => {
+        if (!agrupado[restaurante]) agrupado[restaurante] = [];
+        agrupado[restaurante].push(item);
+      });
+
+      container.innerHTML = '';
+      for (let restaurante in agrupado) {
+        const div = document.createElement('div');
+        div.className = 'pedido-item';
+        div.innerHTML = `
+          <h3>${restaurante}</h3>
+          <ul>
+            ${agrupado[restaurante].map(i => <li>${i}</li>).join('')}
+          </ul>
+        `;
+        container.appendChild(div);
+      }
+    }
+
+    function limparCarrinho() {
+      if (confirm("Deseja realmente limpar o pedido?")) {
+        localStorage.removeItem('carrinho');
+        carregarPedidos();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', carregarPedidos);
   </script>
 </body>
 </html>
