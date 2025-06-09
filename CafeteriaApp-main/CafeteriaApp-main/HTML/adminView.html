@@ -6,12 +6,10 @@
   <title>Marmitas Ready</title>
   <link rel="stylesheet" href="/CafeteriaApp-main/CafeteriaApp-main/CSS/AdmV.css" />
   <style>
-
     .expandable-content {
       display: none;
       margin-top: 10px;
     }
-
     .toggle-button {
       background: none;
       border: none;
@@ -23,7 +21,6 @@
       margin-top: 20px;
       color: white;
     }
-
     .pedido-card {
       display: flex;
       background-color: #e0e0e0;
@@ -33,26 +30,21 @@
       justify-content: space-between;
       align-items: center;
     }
-
     .pedido-img {
       width: 60px;
       height: 60px;
       background-color: #ccc;
       margin-right: 15px;
     }
-
     .pedido-info {
       flex-grow: 1;
     }
-
     .pedido-actions {
       margin-top: 10px;
     }
-
     .pedido-actions button {
       margin-right: 10px;
     }
-
     .status-label {
       padding: 5px 10px;
       border-radius: 12px;
@@ -60,17 +52,14 @@
       font-weight: bold;
       white-space: nowrap;
     }
-
     .entregue {
       background-color: #c8e6c9;
       color: #2e7d32;
     }
-
     .em-rota {
       background-color: #fff9c4;
       color: #f57f17;
     }
-
     .status-footer {
       display: flex;
       justify-content: space-between;
@@ -80,18 +69,15 @@
       margin-top: 20px;
       border-radius: 5px;
     }
-
     body {
       background-color: #2d2d2d;
       font-family: Arial, sans-serif;
     }
-
     input.search-box {
       width: 100%;
       padding: 10px;
       margin-bottom: 20px;
     }
-
     button.section-button {
       background-color: #4d4d4d;
       color: white;
@@ -99,18 +85,66 @@
       border: none;
       margin-bottom: 10px;
       border-radius: 4px;
+      cursor: pointer;
     }
-    
+    /* Modal Criar Produto */
+    #modalCriarProduto {
+      display: none;
+      position: fixed; 
+      top: 0; left: 0; 
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7); 
+      justify-content: center; 
+      align-items: center;
+      z-index: 1000;
+    }
+    #modalCriarProduto > div {
+      background: #fff; 
+      padding: 20px; 
+      border-radius: 8px; 
+      width: 300px; 
+      position: relative;
+      color: #000;
+    }
+    #modalCriarProduto label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    #modalCriarProduto input {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    #modalCriarProduto button {
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+    }
+    #btnSalvarProduto {
+      background-color: #007bff;
+      color: white;
+    }
+    #btnCancelar {
+      margin-left: 10px;
+      background-color: #ccc;
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>Marmitas Ready</h1>
+    <h1>Pastéis do Robson
+    </h1>
     <div class="icon perfil"></div>
   </header>
 
   <main>
     <input type="text" placeholder="Pesquisar Pedidos" class="search-box" />
+
+    <!-- Botão Criar Produto -->
+    <button id="btnCriarProduto" class="section-button" style="background-color:#007bff; margin-bottom: 20px;">Criar Produto</button>
 
     <button class="section-button">Pedidos Em Produção</button>
 
@@ -175,6 +209,21 @@
     </div>
   </main>
 
+  <!-- Modal Criar Produto -->
+  <div id="modalCriarProduto">
+    <div>
+      <h2>Criar Produto</h2>
+      <form id="formCriarProduto">
+        <label for="nomeProduto">Nome:</label>
+        <input id="nomeProduto" type="text" name="nome" required />
+        <label for="valorProduto">Valor (R$):</label>
+        <input id="valorProduto" type="number" name="valor" min="0" step="0.01" required />
+        <button id="btnSalvarProduto" type="submit">Salvar</button>
+        <button id="btnCancelar" type="button">Cancelar</button>
+      </form>
+    </div>
+  </div>
+
   <script>
     function toggleDespesas() {
       const content = document.getElementById('despachados');
@@ -187,6 +236,60 @@
         arrow.textContent = '🔽';
       }
     }
+
+    const idRestaurante = 5; // Ajuste para seu restaurante real
+
+    const btnCriarProduto = document.getElementById('btnCriarProduto');
+    const modalCriarProduto = document.getElementById('modalCriarProduto');
+    const formCriarProduto = document.getElementById('formCriarProduto');
+    const btnCancelar = document.getElementById('btnCancelar');
+
+    btnCriarProduto.onclick = () => {
+      modalCriarProduto.style.display = 'flex';
+    };
+
+    btnCancelar.onclick = () => {
+      modalCriarProduto.style.display = 'none';
+    };
+
+    formCriarProduto.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const nome = formCriarProduto.nome.value.trim();
+      const valor = parseFloat(formCriarProduto.valor.value);
+
+      if (!nome || isNaN(valor) || valor < 0) {
+        alert('Preencha corretamente o nome e o valor.');
+        return;
+      }
+
+      try {
+        const response = await fetch('https://cafeteriaapp.onrender.com/api/Produto/criar', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            nome,
+            valor,
+            idRestaurante,
+          }),
+        });
+
+        if (response.ok) {
+          alert('Produto criado com sucesso!');
+          modalCriarProduto.style.display = 'none';
+          formCriarProduto.reset();
+          // TODO: atualizar o cardápio, se desejar
+        } else {
+          const err = await response.text();
+          alert('Erro ao criar produto: ' + err);
+        }
+      } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao criar produto, tente novamente.');
+      }
+    });
   </script>
 </body>
 </html>

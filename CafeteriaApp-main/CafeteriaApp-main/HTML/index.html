@@ -33,7 +33,7 @@
 </div>
 
 <script>
-    document.getElementById('login-form').addEventListener('submit', async function(event) {
+  document.getElementById('login-form').addEventListener('submit', async function(event) {
     event.preventDefault();
 
     const email = event.target.email.value;
@@ -49,23 +49,23 @@
         body: JSON.stringify({ email, senha })
       });
 
-      const result = await response.text(); // <-- alterado aqui!
+      const result = await response.json();
 
       if (response.status === 200) {
-        alert(result); // Mostra o texto "Login bem-sucedido."
-        window.location.href = 'Home.html';
+        // Salva o id do usuário no localStorage
+        localStorage.setItem('userId', result.id);
 
+        alert(result.mensagem);
+        window.location.href = 'Home.html';
       } else {
-        alert(result || 'Falha ao fazer login.');
+        alert(result.mensagem || 'Falha ao fazer login.');
       }
     } catch (error) {
       alert('Erro de conexão com o servidor.');
       console.error(error);
     }
   });
-
 </script>
-
 
 </body>
 </html>
