@@ -39,7 +39,7 @@
     margin-bottom: 20px;
   }
   
-  .section-button {
+  .section-button, .toggle-button {
     background-color: #444;
     color: #fff;
     padding: 10px 15px;

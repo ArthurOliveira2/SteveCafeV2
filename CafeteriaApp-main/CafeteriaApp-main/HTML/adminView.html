@@ -5,6 +5,103 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Marmitas Ready</title>
   <link rel="stylesheet" href="/CafeteriaApp-main/CafeteriaApp-main/CSS/AdmV.css" />
+  <style>
+
+    .expandable-content {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .toggle-button {
+      background: none;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 20px;
+      color: white;
+    }
+
+    .pedido-card {
+      display: flex;
+      background-color: #e0e0e0;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 5px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pedido-img {
+      width: 60px;
+      height: 60px;
+      background-color: #ccc;
+      margin-right: 15px;
+    }
+
+    .pedido-info {
+      flex-grow: 1;
+    }
+
+    .pedido-actions {
+      margin-top: 10px;
+    }
+
+    .pedido-actions button {
+      margin-right: 10px;
+    }
+
+    .status-label {
+      padding: 5px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .entregue {
+      background-color: #c8e6c9;
+      color: #2e7d32;
+    }
+
+    .em-rota {
+      background-color: #fff9c4;
+      color: #f57f17;
+    }
+
+    .status-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #cfcfcf;
+      padding: 10px;
+      margin-top: 20px;
+      border-radius: 5px;
+    }
+
+    body {
+      background-color: #2d2d2d;
+      font-family: Arial, sans-serif;
+    }
+
+    input.search-box {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+
+    button.section-button {
+      background-color: #4d4d4d;
+      color: white;
+      padding: 10px;
+      border: none;
+      margin-bottom: 10px;
+      border-radius: 4px;
+    }
+    
+  </style>
 </head>
 <body>
   <header>
@@ -15,7 +112,7 @@
   <main>
     <input type="text" placeholder="Pesquisar Pedidos" class="search-box" />
 
-    <button class="section-button">Pedidos Pendentes</button>
+    <button class="section-button">Pedidos Em Produção</button>
 
     <div class="pedido-card">
       <div class="pedido-img"></div>
@@ -31,12 +128,65 @@
       </div>
     </div>
 
-    <button class="section-button">Pedidos Despachados</button>
+    <!-- BOTÃO EXPANDIR -->
+    <button class="toggle-button" onclick="toggleDespesas()">
+      <span id="arrow">▶</span> Pedidos Despachados
+    </button>
+
+    <!-- CONTEÚDO EXPANSÍVEL -->
+    <div class="expandable-content" id="despachados">
+      <div class="pedido-card">
+        <div class="pedido-img"></div>
+        <div class="pedido-info">
+          <p><strong>PEDIDO #0460</strong></p>
+          <p>Marmita de carne</p>
+          <p>R$35,50</p>
+          <p>Rua Sempre Viva</p>
+        </div>
+        <span class="status-label entregue">Entregue</span>
+      </div>
+
+      <div class="pedido-card">
+        <div class="pedido-img"></div>
+        <div class="pedido-info">
+          <p><strong>PEDIDO #0461</strong></p>
+          <p>Marmita vegetariana</p>
+          <p>R$29,90</p>
+          <p>Rua das Flores</p>
+        </div>
+        <span class="status-label entregue">Entregue</span>
+      </div>
+
+      <div class="pedido-card">
+        <div class="pedido-img"></div>
+        <div class="pedido-info">
+          <p><strong>PEDIDO #0462</strong></p>
+          <p>Marmita fitness</p>
+          <p>R$38,00</p>
+          <p>Rua dos Atletas</p>
+        </div>
+        <span class="status-label em-rota">Em rota de entrega</span>
+      </div>
+    </div>
 
     <div class="status-footer">
       <span>Pedidos Entregues 2/3</span>
       <span class="badge">1 Pedido em rota de entrega</span>
     </div>
   </main>
+
+  <script>
+    function toggleDespesas() {
+      const content = document.getElementById('despachados');
+      const arrow = document.getElementById('arrow');
+      if (content.style.display === 'block') {
+        content.style.display = 'none';
+        arrow.textContent = '▶';
+      } else {
+        content.style.display = 'block';
+        arrow.textContent = '🔽';
+      }
+    }
+  </script>
 </body>
 </html>
