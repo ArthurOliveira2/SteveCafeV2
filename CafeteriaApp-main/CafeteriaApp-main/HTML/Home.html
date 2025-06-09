@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Home - Delivery</title>
-  <link rel="stylesheet" href="/CafeteriaApp-main/CafeteriaApp-main/CSS/Home.css">
+  <link rel="stylesheet" href="/SteveCafeV2/CafeteriaApp-main/CafeteriaApp-main/CSS/Home.css">
 </head>
 <body>
   <header>
@@ -21,30 +21,60 @@
     <div class="promocao">
       <div class="imagem"></div>
       <div>
-        <p>Hambúrguer do cicllano</p>
-        <p>lorem ipsum</p>
+        <p>Hambúrguer do Cicllano</p>
+        <p></p>
       </div>
     </div>
 
-    <button class="titulo">Outras opções</button>
+    <button class="titulo">Restaurantes disponíveis</button>
     <div class="opcoes">
-      <div class="card">
-        <div class="imagem"></div>
-        <p>Pizza do fulano</p>
-        <p>4,5 ⭐</p>
+      <div class="card restaurante" onclick="abrirCardapio('Pastéis do Robson')">
+        <img src="/SteveCafeV2/CafeteriaApp-main/CafeteriaApp-main/IMG/istock-1496435795.jpg" alt="Pastéis do Robson">
+        <p class="titulo-card">Pastéis do Robson</p>
+        <p>4,8 ⭐</p>
       </div>
-      <div class="card">
-        <div class="imagem"></div>
-        <p>Pizza do fulano</p>
-        <p>4,5 ⭐</p>
+
+      <div class="card restaurante" onclick="abrirCardapio('Pizza da Vó Maria')">
+        <img src="/SteveCafeV2/CafeteriaApp-main/CafeteriaApp-main/IMG/pizza.jpg" alt="Pizza da Vó Maria">
+        <p class="titulo-card">Pizza da Vó Maria</p>
+        <p>4,9 ⭐</p>
       </div>
-      <div class="card">
-        <div class="imagem"></div>
-        <p>Pizza do fulano</p>
+
+      <div class="card restaurante" onclick="abrirCardapio('Lanches do Zé')">
+        <img src="/SteveCafeV2/CafeteriaApp-main/CafeteriaApp-main/IMG/lanche.jpg" alt="Lanches do Zé">
+        <p class="titulo-card">Lanches do Zé</p>
+        <p>4,7 ⭐</p>
+      </div>
+
+      <div class="card restaurante" onclick="abrirCardapio('Burguer da Ju')">
+        <img src="/SteveCafeV2/CafeteriaApp-main/CafeteriaApp-main/IMG/images.jpg" alt="Burguer da Ju">
+        <p class="titulo-card">Burguer da Ju</p>
+        <p>4,6 ⭐</p>
+      </div>
+
+      <div class="card restaurante" onclick="abrirCardapio('Tapiocaria Brasil')">
+        <img src="/SteveCafeV2/CafeteriaApp-main/CafeteriaApp-main/IMG/tapioca.jpg" alt="Tapiocaria Brasil">
+        <p class="titulo-card">Tapiocaria Brasil</p>
+        <p>4,9 ⭐</p>
+      </div>
+
+      <div class="card restaurante" onclick="abrirCardapio('Yakissoba Express')">
+        <img src="/SteveCafeV2/CafeteriaApp-main/CafeteriaApp-main/IMG/Yakissoba-tradicional.png" alt="Yakissoba Express">
+        <p class="titulo-card">Yakissoba Express</p>
         <p>4,5 ⭐</p>
       </div>
     </div>
   </main>
+
+  <!-- MODAL -->
+  <div id="cardapioModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="fecharCardapio()">&times;</span>
+      <img id="imagemRestaurante" class="imagem-popup" src="" alt="Imagem do restaurante">
+      <h2 id="nomeRestaurante">Cardápio</h2>
+      <ul id="itensCardapio"></ul>
+    </div>
+  </div>
 
   <aside id="menuLateral" class="menu-lateral">
     <div class="perfil-header">
@@ -69,6 +99,74 @@
     perfilBtn.onclick = () => menuLateral.style.right = "0";
     fecharMenu.onclick = () => menuLateral.style.right = "-450px";
     pedidosBtn.onclick = () => window.location.href = "pedidos.html";
+
+    const cardapios = {
+      "Pastéis do Robson": {
+        imagem: "/SteveCafeV2/CafeteriaApp-main/CafeteriaApp-main/IMG/istock-1496435795.jpg",
+        itens: ["Pastel de carne - R$8", "Pastel de queijo - R$7", "Refrigerante - R$5"]
+      },
+      "Pizza da Vó Maria": {
+        imagem: "/SteveCafeV2/CafeteriaApp-main/CafeteriaApp-main/IMG/pizza.jpg",
+        itens: ["Pizza calabresa - R$35", "Pizza marguerita - R$38", "Suco natural - R$6"]
+      },
+      "Lanches do Zé": {
+        imagem: "/SteveCafeV2/CafeteriaApp-main/CafeteriaApp-main/IMG/lanche.jpg",
+        itens: ["Sanduíche natural - R$12", "Café preto - R$4", "Bolo caseiro - R$6"]
+      },
+      "Burguer da Ju": {
+        imagem: "/SteveCafeV2/CafeteriaApp-main/CafeteriaApp-main/IMG/images.jpg",
+        itens: ["Cheeseburguer - R$20", "Combo duplo - R$35", "Batata média - R$9"]
+      },
+      "Tapiocaria Brasil": {
+        imagem: "/SteveCafeV2/CafeteriaApp-main/CafeteriaApp-main/IMG/tapioca.jpg",
+        itens: ["Tapioca de frango - R$15", "Tapioca doce - R$12", "Água de coco - R$5"]
+      },
+      "Yakissoba Express": {
+        imagem: "/SteveCafeV2/CafeteriaApp-main/CafeteriaApp-main/IMG/Yakissoba-tradicional.png",
+        itens: ["Yakissoba carne - R$30", "Veggie yakissoba - R$28", "Chá verde - R$4"]
+      }
+    };
+
+    let restauranteAtual = "";
+
+    function abrirCardapio(nome) {
+      restauranteAtual = nome;
+      document.getElementById('nomeRestaurante').innerText = Cardápio - ${nome};
+      document.getElementById('imagemRestaurante').src = cardapios[nome].imagem;
+
+      const lista = document.getElementById('itensCardapio');
+      lista.innerHTML = "";
+      cardapios[nome].itens.forEach(item => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span>${item}</span>
+            <button onclick="adicionarItem('${item}')" class="botao-adicionar" style="padding: 4px 10px; font-size: 0.9rem;">+</button>
+          </div>
+        `;
+        lista.appendChild(li);
+      });
+
+      document.getElementById('cardapioModal').style.display = "block";
+    }
+
+    function fecharCardapio() {
+      document.getElementById('cardapioModal').style.display = "none";
+    }
+
+    function adicionarItem(item) {
+      let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+      carrinho.push({ restaurante: restauranteAtual, item });
+      localStorage.setItem('carrinho', JSON.stringify(carrinho));
+      alert(Item adicionado: ${item});
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('cardapioModal');
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
   </script>
 </body>
 </html>
